@@ -1,0 +1,584 @@
+<!DOCTYPE html> 
+<html>
+<head>
+<meta charset="utf-8">
+<title>ROAG</title>
+<link href="jquery.mobile.theme-1.0.min.css" rel="stylesheet" type="text/css"/>
+<link href="jquery.mobile.structure-1.0.min.css" rel="stylesheet" type="text/css"/>
+<link href="mystyle.css" rel="stylesheet" type="text/css"/>
+
+<script src="jquery-1.6.4.min.js" type="text/javascript"></script>
+<script src="myjava2.js" type="text/javascript"></script>
+<script src="jquery.mobile-1.0.min.js" type="text/javascript"></script>
+<script type="text/javascript">
+function saveData(){
+    //Our text field data
+    var txtName = $('#txtName').val();
+	var bed=$("#problemlistq").html();
+    
+    //Check databases are supported
+    if(openDatabase){
+        //Open a database transaction
+        db.transaction(function(tx){
+            //Execute an SQL statement to create the table "tblDemo" 
+            //only if it doesn't already exist                
+            tx.executeSql('CREATE TABLE IF NOT EXISTS tblRoagtest4 ('
+                           + 'personId INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,'
+                           + 'personName VARCHAR(255),'
+                           + 'bed VARCHAR(10000),'
+						   + 'datum DATETIME'
+                           + ');',[],nullData,errorHandler);
+        });
+        
+        //Open a new transaction
+        db.transaction(function(tx){
+            //Exexute an INSERT with the name, age and favourite colour, 
+            //we set values outside the SQL string for added security and 
+            //to prevent SQL injections, the values are represented with "?"
+            tx.executeSql('INSERT INTO tblRoagtest4 ('
+                           + 'personName, bed, datum)'
+                           + 'VALUES (?, ?, datetime("NOW"));'
+                           ,[txtName,bed],nullData,errorHandler);
+        });
+    }
+	window.location="#page13";
+}
+
+/////
+///Get Data Function
+/////
+function getData(){
+    //Create an empty results string
+    var strResults = '';
+    $('#resultlist li').remove();
+	 
+    //Open a new transaction
+    db.transaction(function(tx){
+        //Select a wildcard from the database
+        tx.executeSql('SELECT personName, personId, bed, datum FROM tblRoagtest4 ORDER BY datum DESC'
+                       ,[]
+                       //Callback function with transaction and 
+                       //results objects
+                       ,function(tx, results){
+                            //Count the results rows
+                            for (var i = 0; i < results.rows.length; i++){
+								var row = results.rows.item(i);
+
+								
+								(function(uid, personName, bed, datum) {
+    $('<li id="personName' + uid + '"><a href="#dialog2" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inset="true" class="openspecificdialog" href="#dialog2">' + personName + '<br/><h5>' + datum + '</h5></li>').bind('tap', function(){
+		$('#btnDelete').button('refresh');
+		$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/>' + bed + '<a href="#page11" data-role="button" data-rel="back" data-transition="fade">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" onclick="deleteData(' + uid + ')">Radera</a>').trigger('refresh');
+    }).appendTo(".results ul").trigger('create');
+  })(row['personId'], row['personName'], row['bed'], row['datum']);									  
+                            }
+                        }
+                       ,errorHandler);
+					   
+    });
+}
+
+function deleteData(id) { 
+
+db.transaction(function(tx) { tx.executeSql('DELETE FROM tblRoagtest4 WHERE personId=?', [id]); }); }
+/////
+///Error Handler
+/////
+function errorHandler(transaction, error) {
+    //Log the error
+    console.log('Error: ' + error.message + ' (Code ' + error.code + ')');
+}
+
+/////
+///Null Data
+/////
+function nullData(){
+    //Can be used for callbacks etc
+}
+/////
+///Document Ready 
+/////
+
+$(document).ready(function(){
+    //Bind events to the buttons to fire off the functions   
+      $('#page13').live('pageshow',function(event, ui){
+    getData();
+});     
+    $('#btnSave').bind('click' , saveData);
+    $('#btnGet').bind('click' , getData);
+	$('#btnDelete').bind('click' , deleteData);
+
+$('#btnDelete').click(function(){
+    var item2 = $("#resultlist").find("li:contains(this)");
+    item2.remove();
+    getData();
+})
+	
+    
+    //Open the database 
+    if(openDatabase){
+        db = openDatabase('Database Name' , '1.0' , 'Database Description' , 2 * 1024 * 1024);
+    }
+    //Alert the user to upgrade their browser
+    else {
+        alert('Databases not supported. Please get a proper browser');
+    }
+    
+});
+</script>
+
+<link rel="apple-touch-icon" href="friska-tander-right.png" />
+<meta name="viewport" 
+content="width=device-width, 
+initial-scale=1, maximum-scale=1, 
+user-scalable=no">
+
+</head> 
+<body> 
+<div id="container">
+<div data-role="page" id="page" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content" data-iscroll="scroller">	
+		<p>Det är viktigt att kontinuerligt inspektera munnen för att förebygga och förhindra problem. ROAG kan då vara ett hjälpmedel så att bedömningen blir mer strukturerad. </p>
+        <p><strong>Metod:</strong> Använd tesked, munspegel och belysning för inspektion av munhålan. Observera bland annat röst, läppar och sväljförmåga. Markera det alternativ som passar in bäst.</p> 
+        <a href="#page2" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true" class="clearform" onclick="clearform()">Gör munhälsobedömning</a> 
+    </div>
+    <div data-role="footer" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+
+<div data-role="page" id="page2" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content" data-iscroll="scroller">		
+            <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg1"><h3>Röst</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton1" id="R1" value="1" />
+         	<label for="R1">1. Normal röst</label>
+
+         	<input class="questions" type="radio" name="radiobutton1" id="R2" value="2"  />
+         	<label for="R2">2. Torr, hes, smackande</label>
+
+         	<input class="questions" type="radio" name="radiobutton1" id="R3" value="3"  />
+         	<label for="R3">3. Svårt att tala</label>
+    </fieldset>
+    
+        </div>
+       <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page3" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+        
+    </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page3" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+                <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg2"><h3>Läppar</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton2" id="R4" value="1" />
+         	<label for="R4">1. Lena, ljusa, fuktiga</label>
+
+
+         	<input class="questions" type="radio" name="radiobutton2" id="R5" value="2"  />
+         	<label for="R5">2. Torra, spruckna, sår i mungiporna</label>
+
+         	<input class="questions" type="radio" name="radiobutton2" id="R6" value="3"  />
+         	<label for="R6">3. Såriga, blödande</label>
+    </fieldset>
+    
+        </div>
+
+        <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page4" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page4" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+                    <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg3"><h3>Munslemhinnor</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton3" id="R7" value="1" />
+         	<label for="R7">1. Ljusröda, fuktiga</label>
+
+         	<input class="questions" type="radio" name="radiobutton3" id="R8" value="2"  />
+         	<label for="R8">2. Röda, torra och områden med färgförändringar eller beläggning</label>
+
+         	<input class="questions" type="radio" name="radiobutton3" id="R9" value="3"  />
+         	<label for="R9">3. Sår, med eller utan blödning, blåsor</label>
+    </fieldset>
+    	
+        </div>
+
+            <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page5" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-active" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page5" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+                        <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg4"><h3>Tunga</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton4" id="R10" value="1" />
+         	<label for="R10">1. Ljusröda, fuktiga med papiller</label>
+
+         	<input class="questions" type="radio" name="radiobutton4" id="R11" value="2"  />
+         	<label for="R11">2. Inga papiller, röd, torr beläggning</label>
+
+         	<input class="questions" type="radio" name="radiobutton4" id="R12" value="3"  />
+         	<label for="R12">3. Sår med eller utan blödning, blåsor</label>
+    </fieldset>
+    
+        </div>
+        <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page6" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page6" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+                            <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg5"><h3>Tandkött</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton5" id="R13" value="1" />
+         	<label for="R13">1. Ljusrött och fast</label>
+
+         	<input class="questions" type="radio" name="radiobutton5" id="R14" value="2"  />
+         	<label for="R14">2. Svullet, rodnat</label>
+
+         	<input class="questions" type="radio" name="radiobutton5" id="R15" value="3"  />
+         	<label for="R15">3. Spontan blödning</label>
+    </fieldset>
+    
+        </div>
+        <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page7" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page7" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content" data-iscroll="scroller">
+                                <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg6"><h3>Tänder</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton6" id="R16" value="1" />
+         	<label for="R16">1. Rena, inga synliga beläggningar eller matrester</label>
+
+         	<input class="questions" type="radio" name="radiobutton6" id="R17" value="2"  />
+         	<label for="R17">2. Beläggning eller matrester lokalt, trasiga tänder</label>
+
+         	<input class="questions" type="radio" name="radiobutton6" id="R18" value="3"  />
+         	<label for="R18">3. Beläggning eller matrester generellt, trasiga tänder</label>
+    </fieldset>
+    
+        </div>
+        <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" >Bakåt</a>
+       <a href="#page8" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page8" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+                                    <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg7"><h3>Protes</h3></legend>
+        	<input class="questions" type="radio" name="radiobutton7" id="R28" value="1" />
+         	<label for="R28">1. Ej i behov av protes</label>
+            
+         	<input class="questions" type="radio" name="radiobutton7" id="R19" value="1" />
+         	<label for="R19">1. Ren och fungerande</label>
+
+         	<input class="questions" type="radio" name="radiobutton7" id="R20" value="2"  />
+         	<label for="R20">2. Beläggning eller matrester</label>
+
+         	<input class="questions" type="radio" name="radiobutton7" id="R21" value="3"  />
+         	<label for="R21">3. Används ej/dåligt fungerande</label>
+    </fieldset>
+    
+        </div>
+        <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page9" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page9" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+                                        <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg8"><h3>Saliv</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton8" id="R22" value="1" />
+         	<label for="R22">1. Glider lätt</label>
+
+         	<input class="questions" type="radio" name="radiobutton8" id="R23" value="2"  />
+         	<label for="R23">2. Glider trögt</label>
+
+         	<input class="questions" type="radio" name="radiobutton8" id="R24" value="3"  />
+         	<label for="R24">3. Glider inte alls</label>
+    </fieldset>
+    
+        </div>
+        <a data-rel="back" data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true">Bakåt</a>
+       <a href="#page10" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inline="true">Nästa</a>
+          </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+        <div data-role="page" id="page10" data-theme="a">
+	<div class="header" data-role="header">
+    <h1>Munhälsa</h1>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">
+   <div data-role="fieldcontain">
+    <fieldset data-role="controlgroup">
+    	<legend id="leg9"><h3>Sväljning</h3></legend>
+         	<input class="questions" type="radio" name="radiobutton9" id="R25" value="1" />
+         	<label for="R25">1. Obehindrad sväljning</label>
+
+         	<input class="questions" type="radio" name="radiobutton9" id="R26" value="2"  />
+         	<label for="R26">2. Obetydliga sväljningsproblem</label>
+
+         	<input class="questions" type="radio" name="radiobutton9" id="R27" value="3"  />
+         	<label for="R27">3. Uttalade sväljningsproblem</label>
+    </fieldset>
+    
+      </div>
+         <a data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" data-rel="back">Bakåt</a>
+<a href="#dialog" class="button" id="validate" data-inline="true" name="result" data-theme="b" data-icon="check" data-iconpos="right" data-rel="dialog" data-transition="fade" data-role="button">Validera</a>
+	</div>
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+	<div data-role="navbar">
+		<ul>
+		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+          <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+	</div>
+</div>
+
+<div data-role="page" id="page11" data-transition="slidedown" data-theme="a">
+  <div class="headersub" data-role="header">
+  <a class="backbtn" href="#" data-add-back-btn="true" data-rel="back" data-back-btn-theme="b">Bakåt</a>
+    <h3>Munvård</h3>
+    <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+  </div>
+  <div data-role="content">
+    <div data-role="collapsible-set">
+      <div data-role="collapsible">
+        <h3>ROAG-instrument</h3>
+        <p>Innehåll</p>
+      </div>
+      <div data-role="collapsible" data-collapsed="true">
+        <h3>Munvård</h3>
+        <p>Kontinuerlig inspektion av munhålan och god munvård är viktigt när personerna är så sjuka att de inte orkar be om hjälp eller beskriva sina problem.</p>
+  <p>Munvård, när den svårt sjuke inte längre orkar borsta tänderna eller har sänkt medvetande, kan göras på följande sätt:</p>
+<ul>
+	<li>Berätta för personen vad du ska göra, även om han/hon är medvetslös.</li>
+	<li>Inspektera munhålan, med ficklampa och tesked. Titta efter om det finns skador på tänder eller protes, om det finns sår, rodnader och beläggningar på slemhinnor eller tunga.</li>
+	<li>Borsta ev. tänderna 1–2 ggr/dygn med mjuk tandborste. Tag ut och rengör proteser om den svårt sjuke har sådana. Tänk på att protesen kan behöva tas ut om den sitter dåligt i munhålan.</li>
+	<li>Munsköljning är olämpligt om personens medvetande är sänkt.</li>
+
+	<li>Torka ur hela munhålan (inkl. tänder, tunga, gom, munbotten och kindernas insida) med plastpinnar med fastsatt skumgummitork. Ibland biter dock personen ihop munnen och då rengörs försiktigt det som är möjligt (det viktigaste är att fukta slemhinnorna).</li>
+	<li>Smörj munhålan med fuktbevarande gel eller spraya med vatten och matolja blandat i en pumpflaska. Munhålan bör fuktas minst två gånger i timmen.</li>
+	<li>Smörj läppar med vaselin, cerat eller liknande.</li>
+	<li>Droppa lite vatten i mungipan med hjälp av ett sugrör eller en spruta. Ge det personen föredrar, t.ex. vatten, krossad is eller, om han/hon fortfarande kan svälja, små bitar av frukt.</li>
+	<li>Vid tecken på munsmärta kan lokalt smärtstillande medel prövas, t.ex. Xylocain viskös.</li>
+</ul>
+      </div>
+    </div>
+  
+  </div>
+    <div data-role="footer" data-id="foo1" data-position="fixed">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#page" data-transition="slidedown">ROAG</a></li>
+            <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li data-transition="slidedown"><a href="#page11" class="ui-btn-down-a">Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+</div>
+
+
+<div data-role="page" id="page12" data-transition="slidedown" data-theme="a">
+	<div class="headersub" data-role="header">
+    
+		<h1>Munhälsa</h1>
+        <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">	
+		<h3>Skapad av Svenska Palliativregistret. <a href="http://palliativ.se" target="_blank" rel="external">Gå till vår hemsida</a></h3>	
+	</div>
+        <div data-role="footer" data-id="foo1" data-position="fixed">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#page" data-transition="slidedown">ROAG</a></li>
+            <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
+			<li><a href="#page12" class="ui-btn-down-a" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+</div>
+<div data-role="page" id="page13" data-transition="slidedown" data-theme="a">
+	<div class="headersub" data-role="header">
+    
+		<h1>Munhälsa</h1>
+        <img src="friska-tander-right.png" width="94.6" height="57.7" alt="logga" class="logga">
+	</div>
+	<div data-role="content">	
+		<h3>Sparade bedömningar</h3>
+        <div class="results"><ul data-role="listview" id="resultlist"></ul></div>	
+	</div>
+        <div data-role="footer" data-id="foo1" data-position="fixed">
+	<div data-role="navbar">
+		<ul>
+			<li><a href="#page" data-transition="slidedown">ROAG</a></li>
+            <li><a href="#page13" data-transition="slidedown" class="ui-btn-down-a">Sparade</a></li>
+			<li><a href="#page11" data-transition="slidedown" >Munhälsa</a></li>
+			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
+		</ul>
+	</div><!-- /navbar -->
+</div>
+</div>
+<div data-role="dialog" id="dialog">
+    <div data-role="header">
+        <h1 id="headmessage"></h1>
+    </div>
+    <div data-role="content">
+        <p id="contentmessage"></p>
+        	<table id="problemlistq"></table>
+        	<a href="#page11" data-role="button" data-rel="back" data-transition="fade">OK</a><input type='text' id='txtName' placeholder='Minnesanteckning' /><input type='submit' action='#page13' value='Spara bedömning' id='btnSave' />
+    </div>
+</div>​
+<div data-role="dialog" id="dialog2">
+    <div data-role="header">
+        <h1 id="headmessage"></h1>
+    </div>
+    <div data-role="content">
+        <p id="contentmessagespec"></p>
+        	<table id="problemlistqspec"></table>
+        	
+    </div>
+</div>​
+</div>
+</body>
+
+</html>
