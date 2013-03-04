@@ -5,11 +5,12 @@
 <title>ROAG</title>
 <link href="jquery.mobile.theme-1.0.min.css" rel="stylesheet" type="text/css"/>
 <link href="jquery.mobile.structure-1.0.min.css" rel="stylesheet" type="text/css"/>
-<link href="mystyle.css" rel="stylesheet" type="text/css"/>
+
 
 <script src="jquery-1.6.4.min.js" type="text/javascript"></script>
 <script src="myjava2.js" type="text/javascript"></script>
 <script src="jquery.mobile-1.0.min.js" type="text/javascript"></script>
+<link href="mystyle.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript">
 function saveData(){
     //Our text field data
@@ -59,68 +60,72 @@ function getData(){
                        ,[]
                        //Callback function with transaction and 
                        //results objects
-                       ,function(tx, results){
+                       ,function(tx, results)
+					   {
                             //Count the results rows
-                            for (var i = 0; i < results.rows.length; i++){
+                            for (var i = 0; i < results.rows.length; i++)
+							{
 								var row = results.rows.item(i);
-
-								
-								(function(uid, personName, bed, datum) {
-    $('<li id="personName' + uid + '"><a href="#dialog2" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inset="true" class="openspecificdialog" href="#dialog2">' + personName + '<br/><h5>' + datum + '</h5></li>').bind('tap', function(){
-		$('#btnDelete').button('refresh');
-		$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/>' + bed + '<a href="#page11" data-role="button" data-rel="back" data-transition="fade">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" onclick="deleteData(' + uid + ')">Radera</a>').trigger('refresh');
-    }).appendTo(".results ul").trigger('create');
-  })(row['personId'], row['personName'], row['bed'], row['datum']);									  
-                            }
-                        }
-                       ,errorHandler);
+								(function(uid, personName, bed, datum) 
+								{
+    								$('<li id="personName' + uid + '"><a href="#dialog2" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inset="true" class="openspecificdialog" href="#dialog2">' + personName + '<br/><h5>' + datum + '</h5></li>').bind('tap', function()
+						{
+							$('#btnDelete').button('refresh');
+							$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/>' + bed + '<a href="#page11" data-role="button" data-rel="back" data-transition="fade">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" onclick="deleteData(' + uid + ')">Radera</a>').trigger('refresh');
+    							}).appendTo(".results ul").trigger('create');
+  						})(row['personId'], row['personName'], row['bed'], row['datum']);									  				}
+		}
+		,errorHandler);
 					   
     });
 }
 
-function deleteData(id) { 
-
-db.transaction(function(tx) { tx.executeSql('DELETE FROM tblRoagtest4 WHERE personId=?', [id]); }); }
+function deleteData(id) 
+{ 
+	db.transaction(function(tx) 
+	{ 
+		tx.executeSql('DELETE FROM tblRoagtest4 WHERE personId=?', [id]); 
+	}); 
+}
 /////
 ///Error Handler
 /////
-function errorHandler(transaction, error) {
+function errorHandler(transaction, error) 
+{
     //Log the error
     console.log('Error: ' + error.message + ' (Code ' + error.code + ')');
 }
 
-/////
-///Null Data
-/////
-function nullData(){
+
+function nullData()
+{
     //Can be used for callbacks etc
 }
-/////
-///Document Ready 
-/////
 
-$(document).ready(function(){
+
+$(document).ready(function()
+{
     //Bind events to the buttons to fire off the functions   
-      $('#page13').live('pageshow',function(event, ui){
-    getData();
-});     
+	$('#page13').live('pageshow',function(event, ui){
+		getData();
+	});     
     $('#btnSave').bind('click' , saveData);
     $('#btnGet').bind('click' , getData);
 	$('#btnDelete').bind('click' , deleteData);
-
-$('#btnDelete').click(function(){
-    var item2 = $("#resultlist").find("li:contains(this)");
-    item2.remove();
-    getData();
-})
-	
-    
+	$('#btnDelete').click(function()
+	{
+    	var item2 = $("#resultlist").find("li:contains(this)");
+    	item2.remove();
+    	getData();
+	})
     //Open the database 
-    if(openDatabase){
+    if(openDatabase)
+	{
         db = openDatabase('Database Name' , '1.0' , 'Database Description' , 2 * 1024 * 1024);
     }
     //Alert the user to upgrade their browser
-    else {
+    else 
+	{
         alert('Databases not supported. Please get a proper browser');
     }
     
@@ -149,7 +154,7 @@ user-scalable=no">
     <div data-role="footer" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -185,7 +190,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -221,7 +226,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -256,7 +261,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-active" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -290,7 +295,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -324,7 +329,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -358,7 +363,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -395,7 +400,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -429,7 +434,7 @@ user-scalable=no">
     <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -460,10 +465,10 @@ user-scalable=no">
          <a data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" data-rel="back">Bakåt</a>
 <a href="#dialog" class="button" id="validate" data-inline="true" name="result" data-theme="b" data-icon="check" data-iconpos="right" data-rel="dialog" data-transition="fade" data-role="button">Validera</a>
 	</div>
-    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false"data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
-		  <li><a href="#page" class="ui-btn-down-a" data-transition="slidedown">ROAG</a></li>
+		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
           <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
@@ -504,12 +509,12 @@ user-scalable=no">
     </div>
   
   </div>
-    <div data-role="footer" data-id="foo1" data-position="fixed">
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
 			<li><a href="#page" data-transition="slidedown">ROAG</a></li>
             <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
-			<li data-transition="slidedown"><a href="#page11" class="ui-btn-down-a">Munhälsa</a></li>
+			<li><a href="#" class="ui-btn-active ui-state-persist" data-transition="slidedown">Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
 		</ul>
 	</div><!-- /navbar -->
@@ -526,13 +531,13 @@ user-scalable=no">
 	<div data-role="content">	
 		<h3>Skapad av Svenska Palliativregistret. <a href="http://palliativ.se" target="_blank" rel="external">Gå till vår hemsida</a></h3>	
 	</div>
-        <div data-role="footer" data-id="foo1" data-position="fixed">
+        <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
 			<li><a href="#page" data-transition="slidedown">ROAG</a></li>
             <li><a href="#page13" data-transition="slidedown">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown">Munhälsa</a></li>
-			<li><a href="#page12" class="ui-btn-down-a" data-transition="slidedown">Om oss</a></li>
+			<li><a href="#" class="ui-btn-active ui-state-persist" data-transition="slidedown">Om oss</a></li>
 		</ul>
 	</div><!-- /navbar -->
 </div>
@@ -547,11 +552,11 @@ user-scalable=no">
 		<h3>Sparade bedömningar</h3>
         <div class="results"><ul data-role="listview" id="resultlist"></ul></div>	
 	</div>
-        <div data-role="footer" data-id="foo1" data-position="fixed">
+        <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
 			<li><a href="#page" data-transition="slidedown">ROAG</a></li>
-            <li><a href="#page13" data-transition="slidedown" class="ui-btn-down-a">Sparade</a></li>
+            <li><a href="#" data-transition="slidedown" class="ui-btn-active ui-state-persist">Sparade</a></li>
 			<li><a href="#page11" data-transition="slidedown" >Munhälsa</a></li>
 			<li><a href="#page12" data-transition="slidedown">Om oss</a></li>
 		</ul>
