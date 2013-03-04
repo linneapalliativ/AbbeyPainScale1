@@ -71,7 +71,7 @@ function getData(){
     								$('<li id="personName' + uid + '"><a href="#dialog2" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inset="true" class="openspecificdialog" href="#dialog2">' + personName + '<br/><h5>' + datum + '</h5></li>').bind('tap', function()
 						{
 							
-							$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/>' + bed + '<a href="#page11" data-role="button" data-rel="back" data-transition="fade" data-theme="b">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" data-theme="c" onclick="deleteData(' + uid + ')">Radera</a>').trigger('create');
+							$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/><table>' + bed + '</table><a href="#page11" data-role="button" data-rel="back" data-transition="fade" data-theme="b">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" data-theme="c" onclick="deleteData(' + uid + ')">Radera</a>').trigger('create');
     							}).appendTo(".results ul").trigger('create');
   						})(row['personId'], row['personName'], row['bed'], row['datum']);									  				}
 		}
@@ -579,7 +579,7 @@ user-scalable=no">
     </div>
     <div data-role="content">
         <p id="contentmessagespec"></p>
-        	<table id="problemlistqspec"></table>
+        	<div id="problemlistqspec"></div>
         	
     </div>
 </div>​
