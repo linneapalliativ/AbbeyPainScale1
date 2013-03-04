@@ -70,8 +70,8 @@ function getData(){
 								{
     								$('<li id="personName' + uid + '"><a href="#dialog2" data-role="button" data-icon="arrow-r" data-iconpos="right" data-inset="true" class="openspecificdialog" href="#dialog2">' + personName + '<br/><h5>' + datum + '</h5></li>').bind('tap', function()
 						{
-							$('#btnDelete').button('refresh');
-							$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/>' + bed + '<a href="#page11" data-role="button" data-rel="back" data-transition="fade">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" onclick="deleteData(' + uid + ')">Radera</a>').trigger('refresh');
+							
+							$("#problemlistqspec").append().html('<b>' + personName + '</b><br/>' + datum + '<br/>' + bed + '<a href="#page11" data-role="button" data-rel="back" data-transition="fade" data-theme="b">OK</a><a href="#page13" data-icon="delete" data-role="button" id="btnDelete" data-iconpos="right" data-transition="fade" class="ui-btn-up-f" data-theme="c" onclick="deleteData(' + uid + ')">Radera</a>').trigger('create');
     							}).appendTo(".results ul").trigger('create');
   						})(row['personId'], row['personName'], row['bed'], row['datum']);									  				}
 		}
@@ -465,7 +465,7 @@ user-scalable=no">
          <a data-role="button" data-icon="arrow-l" data-iconpos="left" data-inline="true" data-rel="back">Bakåt</a>
 <a href="#dialog" class="button" id="validate" data-inline="true" name="result" data-theme="b" data-icon="check" data-iconpos="right" data-rel="dialog" data-transition="fade" data-role="button">Validera</a>
 	</div>
-    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false"data-tap-toggle="false">
+    <div data-role="footer" data-id="foo1" data-position="fixed" data-tap-toggle="false">
 	<div data-role="navbar">
 		<ul>
 		  <li><a href="#page" class="ui-btn-active ui-state-persist" data-transition="slidedown">ROAG</a></li>
@@ -570,7 +570,7 @@ user-scalable=no">
     <div data-role="content">
         <p id="contentmessage"></p>
         	<table id="problemlistq"></table>
-        	<a href="#page11" data-role="button" data-rel="back" data-transition="fade">OK</a><input type='text' id='txtName' placeholder='Minnesanteckning' /><input type='submit' action='#page13' value='Spara bedömning' id='btnSave' />
+        	<a href="#page11" data-role="button" data-rel="back" data-transition="fade" data-theme="b">OK</a><input type='text' id='txtName' placeholder='Minnesanteckning' /><a href='#page13' id='btnSave' data-theme="b" data-role="button" data-icon="check" data-iconpos="right">Spara bedömning</a>
     </div>
 </div>​
 <div data-role="dialog" id="dialog2">
@@ -583,7 +583,7 @@ user-scalable=no">
         	
     </div>
 </div>​
-</div>
+</div>​
 </body>
 
 </html>

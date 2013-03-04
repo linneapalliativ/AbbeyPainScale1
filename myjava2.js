@@ -14,7 +14,7 @@ function clearform() {
 $(function () {
 
 $('#validate').click(function () {
-	
+
 	if ($('input[type=radio]:checked').length == 9)
 	{
 		sum = 0;
@@ -29,7 +29,7 @@ var arr1 = $("input:radio:checked + label").map(function(a, i) {
 
 			if (sum == 9)
 			{
-				$( "#btnSave" ).parent( ".ui-btn" ).show();
+				$( "#btnSave" ).show();
 				$('#txtName').show();
 				document.getElementById("headmessage").innerHTML="Validering";
 				document.getElementById("contentmessage").innerHTML="<h2>Ingen ohälsa i munnen.</h2>Sammanfattning";
@@ -38,7 +38,7 @@ var arr1 = $("input:radio:checked + label").map(function(a, i) {
 			}
 			if (sum > 9)
 			{
-				$( "#btnSave" ).parent( ".ui-btn" ).show();
+				$( "#btnSave" ).show();
 				$('#txtName').show();
 				document.getElementById("problemlistq").innerHTML = arr1 + "<br/ ><h3>Summa: "+ sum+ " av 27</h3>";
 				document.getElementById("headmessage").innerHTML="Validering";
@@ -48,7 +48,7 @@ var arr1 = $("input:radio:checked + label").map(function(a, i) {
 	}
 	else
 	{
-				$( "#btnSave" ).parent( ".ui-btn" ).hide();
+				$("#btnSave" ).hide();
 				$('#txtName').hide();
 				document.getElementById("headmessage").innerHTML="Validering";
 				document.getElementById("contentmessage").innerHTML="Du måste besvara alla frågor för att kunna validera.";
