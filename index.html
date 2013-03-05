@@ -38,7 +38,7 @@ function saveData(){
             //to prevent SQL injections, the values are represented with "?"
             tx.executeSql('INSERT INTO tblRoagtest4 ('
                            + 'personName, bed, datum)'
-                           + 'VALUES (?, ?, datetime("NOW"));'
+                           + 'VALUES (?, ?, datetime("NOW", "localtime"));'
                            ,[txtName,bed],nullData,errorHandler);
         });
     }
